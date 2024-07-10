@@ -32,9 +32,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'User', targetEntity: Article::class)]
     private Collection $articles;
 
+    #[ORM\ManyToMany(targetEntity: Messages::class, mappedBy: 'user_id')]
+    private Collection $messages;
+
+    #[ORM\ManyToMany(targetEntity: Followers::class, mappedBy: 'user_id')]
+    private Collection $followers;
+
+    #[ORM\OneToOne(mappedBy: 'user_id', cascade: ['persist', 'remove'])]
+    private ?UserDetails $userDetails = null;
+
     public function __construct()
     {
         $this->articles = new ArrayCollection();
+        $this->messages = new ArrayCollection();
+        $this->followers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -133,6 +144,77 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $article->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Messages>
+     */
+    public function getMessages(): Collection
+    {
+        return $this->messages;
+    }
+
+    public function addMessage(Messages $message): static
+    {
+        if (!$this->messages->contains($message)) {
+            $this->messages->add($message);
+            $message->addUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessage(Messages $message): static
+    {
+        if ($this->messages->removeElement($message)) {
+            $message->removeUserId($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Followers>
+     */
+    public function getFollowers(): Collection
+    {
+        return $this->followers;
+    }
+
+    public function addFollower(Followers $follower): static
+    {
+        if (!$this->followers->contains($follower)) {
+            $this->followers->add($follower);
+            $follower->addUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollower(Followers $follower): static
+    {
+        if ($this->followers->removeElement($follower)) {
+            $follower->removeUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function getUserDetails(): ?UserDetails
+    {
+        return $this->userDetails;
+    }
+
+    public function setUserDetails(UserDetails $userDetails): static
+    {
+        // set the owning side of the relation if necessary
+        if ($userDetails->getUserId() !== $this) {
+            $userDetails->setUserId($this);
+        }
+
+        $this->userDetails = $userDetails;
 
         return $this;
     }
