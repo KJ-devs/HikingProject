@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Response;
 
 class ArticleController extends AbstractController
 {
@@ -24,14 +25,19 @@ class ArticleController extends AbstractController
 
         // Gérer l'authentification (exemple)
         $user = $this->security->getUser();
+
+        if (!$user) {
+            return $this->json([
+                'message' => 'User not authenticated'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
         $title = $data['title'];
         $content = $data['content'];
-        $createdAt = $data['createdAt'];
-
-
+        $createdAt = new \DateTimeImmutable();
 
         $response = [
-            'user' => $user,
+            'user' => $user->getUserIdentifier(), // Assuming User entity has getUserIdentifier() method
             'title' => $title,
             'content' => $content,
             'createdAt' => $createdAt,
