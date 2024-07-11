@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import authService from "../services/login";
 import { FaHiking } from "react-icons/fa";
-import { Link } from 'react-router-dom';
-
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigate = useNavigate();
   const handleLogin = async () => {
     try {
       const response = await authService.login(email, password);
       console.log(response);
+      navigate("/");
     } catch (error) {
       if (error instanceof Error) {
         console.log(error.message);
@@ -67,7 +68,12 @@ function LoginForm() {
         </div>
         <div className="mt-4 text-center">
           <span className="text-gray-500">Vous n'avez pas de compte ?</span>{" "}
-          <Link className="text-green-600 hover:underline transition duration-200" to="/register">S'inscrire</Link>
+          <Link
+            className="text-green-600 hover:underline transition duration-200"
+            to="/register"
+          >
+            S'inscrire
+          </Link>
         </div>
       </div>
     </div>
