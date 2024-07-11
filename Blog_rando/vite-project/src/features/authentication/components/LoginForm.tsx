@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import authService from "../services/login";
 import { FaHiking } from "react-icons/fa";
+import { Link } from 'react-router-dom';
 
 function LoginForm() {
   const [email, setEmail] = useState("");
@@ -33,7 +34,7 @@ function LoginForm() {
           <p className="text-gray-500">Login to continue your adventure</p>
         </div>
         <label className="block mb-4">
-          <span className="text-gray-700 font-medium">Username</span>
+          <span className="text-gray-700 font-medium">Email</span>
           <input
             type="text"
             className="mt-2 block w-full px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm transition duration-200"
@@ -42,7 +43,7 @@ function LoginForm() {
           />
         </label>
         <label className="block mb-6">
-          <span className="text-gray-700 font-medium">Password</span>
+          <span className="text-gray-700 font-medium">Mot de passe</span>
           <input
             type="password"
             className="mt-2 block w-full px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm transition duration-200"
@@ -54,24 +55,19 @@ function LoginForm() {
           onClick={handleLogin}
           className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200"
         >
-          Login
+          Connexion
         </button>
         <div className="mt-4 text-center">
           <a
             href="#"
             className="text-green-600 hover:underline transition duration-200"
           >
-            Forgot your password?
+            Vous avez oublié votre mot de passe ?
           </a>
         </div>
         <div className="mt-4 text-center">
-          <span className="text-gray-500">Don't have an account?</span>{" "}
-          <a
-            href="#"
-            className="text-green-600 hover:underline transition duration-200"
-          >
-            Sign up
-          </a>
+          <span className="text-gray-500">Vous n'avez pas de compte ?</span>{" "}
+          <Link className="text-green-600 hover:underline transition duration-200" to="/register">S'inscrire</Link>
         </div>
       </div>
     </div>

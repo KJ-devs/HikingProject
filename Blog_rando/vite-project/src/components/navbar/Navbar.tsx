@@ -23,11 +23,6 @@ function NavBar() {
               </NavLink>
             </li>
             <li>
-              <NavLink to="/register" className="hover:text-gray-300">
-                Inscription
-              </NavLink>
-            </li>
-            <li>
               <NavLink to="/contact" className="hover:text-gray-300">
                 Contact
               </NavLink>
