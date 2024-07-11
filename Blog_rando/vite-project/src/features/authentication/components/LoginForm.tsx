@@ -31,7 +31,7 @@ function LoginForm() {
           <h2 className="text-3xl font-extrabold text-green-700">
             Welcome Back
           </h2>
-          <p className="text-gray-500">Login to continue your adventure</p>
+          <p className="text-gray-500">Connectez-vous pour suivre l'aventure</p>
         </div>
         <label className="block mb-4">
           <span className="text-gray-700 font-medium">Email</span>
