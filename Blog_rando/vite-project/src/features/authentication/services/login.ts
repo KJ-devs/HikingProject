@@ -3,7 +3,7 @@ import axios from '../../../lib/axios'
 
 
 const login = async (email: string, password: string) => {
-  if (email  && password) {
+  if (email && password) {
     try {
       const response = await axios.post(`/auth/login`, {
         email,
@@ -16,7 +16,6 @@ const login = async (email: string, password: string) => {
       }
     } catch (error) {
       throw new Error("Authentification unsuccessful");
-
     }
   
   };

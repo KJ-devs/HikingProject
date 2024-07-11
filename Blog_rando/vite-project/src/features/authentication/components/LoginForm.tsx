@@ -3,12 +3,12 @@ import authService from "../services/login";
 import { FaHiking } from "react-icons/fa";
 
 function LoginForm() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     try {
-      const response = await authService.login(username, password);
+      const response = await authService.login(email, password);
       console.log(response);
     } catch (error) {
       if (error instanceof Error) {
@@ -37,8 +37,8 @@ function LoginForm() {
           <input
             type="text"
             className="mt-2 block w-full px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm transition duration-200"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </label>
         <label className="block mb-6">
