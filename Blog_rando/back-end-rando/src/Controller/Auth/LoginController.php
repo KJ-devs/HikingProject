@@ -1,5 +1,7 @@
 <?php
 
+// src/Controller/Auth/LoginController.php
+
 namespace App\Controller\Auth;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -10,9 +12,10 @@ use App\Entity\User;
 
 class LoginController extends AbstractController
 {
-    #[Route('/auth/login', name: 'api_login')]
+    #[Route('/auth/login', name: 'api_login', methods: ['POST'])]
     public function index(#[CurrentUser] ?User $user): Response
     {
+        
         if (null === $user) {
             return $this->json([
                 'message' => 'missing credentials',
