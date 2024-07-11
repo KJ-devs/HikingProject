@@ -23,7 +23,7 @@ class RegisterController extends AbstractController
         $this->user = $user;
     }
 
-    #[Route('/api/register', name: 'api_register', methods: ['POST'])]
+    #[Route('/auth/register', name: 'api_register', methods: ['POST'])]
     public function register(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         // Récupérer les données de la requête
@@ -59,7 +59,7 @@ class RegisterController extends AbstractController
 
 
 
-      
+
         return $this->json($response);
     }
 }

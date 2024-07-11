@@ -8,14 +8,17 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
+use App\Entity\Article;
+use Doctrine\ORM\EntityManagerInterface;
 
 class ArticleController extends AbstractController
 {
     private Security $security;
-
-    public function __construct(Security $security)
+    private EntityManagerInterface $entityManager;
+    public function __construct(Security $security, EntityManagerInterface $entityManager)
     {
         $this->security = $security;
+        $this->entityManager = $entityManager;
     }
     #[Route('/api/createArticle', name: 'api_article')]
     public function createArticle(Request $request): JsonResponse
@@ -35,6 +38,15 @@ class ArticleController extends AbstractController
         $title = $data['title'];
         $content = $data['content'];
         $createdAt = new \DateTimeImmutable();
+        $article = new Article();
+        $article->setTitle($title);
+        $article->setContent($content);
+        $article->setCreatedAt($createdAt);
+        $article->setUser($user);
+
+        $this->entityManager->persist($article);
+        $this->entityManager->flush();
+
 
         $response = [
             'user' => $user->getUserIdentifier(), // Assuming User entity has getUserIdentifier() method
