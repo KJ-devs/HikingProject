@@ -7,6 +7,7 @@ import NavBar from "./components/navbar/Navbar";
 import Profil from "./pages/Profil";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <SignUp />,
   },
 ]);
 
