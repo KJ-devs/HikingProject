@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Entity\Article;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Photo;
 
 class ArticleController extends AbstractController
 {
@@ -31,7 +32,7 @@ class ArticleController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         // Gérer l'authentification (exemple)
-        $user = $this->security->getUser();
+        $user = $this->getUser(); // Assuming getUser() returns the authenticated user
 
         if (!$user) {
             return $this->json([
@@ -42,24 +43,47 @@ class ArticleController extends AbstractController
         $title = $data['title'];
         $content = $data['content'];
         $createdAt = new \DateTimeImmutable();
+
+        // Create a new Article entity
         $article = new Article();
         $article->setTitle($title);
         $article->setContent($content);
         $article->setCreatedAt($createdAt);
         $article->setUser($user);
 
+        // Handle file upload if photos are included in the request
+        $uploadedFiles = $request->files->get('photos');
+        if ($uploadedFiles) {
+            foreach ($uploadedFiles as $uploadedFile) {
+                // Create a new Photo entity for each uploaded file
+                $photo = new Photo();
+                $photo->setImageFile($uploadedFile);
+                $photo->setSize($uploadedFile->getSize());
+                $photo->setArticle($article);
+
+                // Handle file upload and save to the filesystem
+                $filename = uniqid() . '.' . $uploadedFile->guessExtension();
+                $uploadedFile->move($this->getParameter('photos_directory'), $filename);
+                $photo->setImagePath('/uploads/photos/' . $filename);
+
+                // Add the Photo entity to the Article's collection
+                $article->addPhoto($photo);
+            }
+        }
+
         $this->entityManager->persist($article);
         $this->entityManager->flush();
 
-
-        $response = [
-            'user' => $user->getUserIdentifier(), // Assuming User entity has getUserIdentifier() method
-            'title' => $title,
-            'content' => $content,
-            'createdAt' => $createdAt,
+        // Prepare the response
+        $responseData = [
+            'id' => $article->getId(),
+            'user' => $article->getUser(),
+            'title' => $article->getTitle(),
+            'content' => $article->getContent(),
+            'createdAt' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
         ];
 
-        return $this->json($response);
+        return $this->json($responseData, Response::HTTP_CREATED);
     }
     #[Route('/api/getArticles', name: 'api_get_articles')]
     public function getArticles(Request $request)

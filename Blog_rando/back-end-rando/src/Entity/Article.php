@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 class Article
 {
@@ -153,7 +154,7 @@ class Article
     {
         if (!$this->photos->contains($photo)) {
             $this->photos->add($photo);
-            $photo->setArticleId($this);
+            $photo->setArticle($this);
         }
 
         return $this;
@@ -163,8 +164,8 @@ class Article
     {
         if ($this->photos->removeElement($photo)) {
             // set the owning side to null (unless already changed)
-            if ($photo->getArticleId() === $this) {
-                $photo->setArticleId(null);
+            if ($photo->getArticle() === $this) {
+                $photo->setArticle(null);
             }
         }
 
