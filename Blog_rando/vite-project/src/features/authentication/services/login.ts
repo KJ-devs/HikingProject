@@ -11,6 +11,7 @@ const login = async (email: string, password: string) => {
       });
       if (response.status === 200 && response.data.token) {
         // stocker le token
+        localStorage.setItem("token", response.data.token);
         return response.data.token;
       }
     } catch (error) {
