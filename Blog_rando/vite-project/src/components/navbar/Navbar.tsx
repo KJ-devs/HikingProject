@@ -1,6 +1,17 @@
 import { NavLink } from "react-router-dom";
+import authService from '../../features/authentication/services/logOut';
 
 function NavBar() {
+  const handleLogout = async () => {
+    try {
+      // Appeler le service de déconnexion
+      authService.logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+
   return (
     <header className="bg-gray-800 py-4">
       <div className="container mx-auto flex justify-between items-center">
@@ -25,6 +36,11 @@ function NavBar() {
             <li>
               <NavLink to="/contact" className="hover:text-gray-300">
                 Contact
+              </NavLink>
+            </li>
+            <li>
+              <NavLink onClick={handleLogout} to="/login" className="hover:text-gray-300">
+                Déconnexion
               </NavLink>
             </li>
           </ul>
