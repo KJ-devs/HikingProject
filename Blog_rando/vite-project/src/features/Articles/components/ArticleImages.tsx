@@ -1,10 +1,9 @@
-// components/ArticleImages.tsx
+// ArticleImages.tsx
 
 import React from "react";
 
-interface Image {
-  url: string;
-  alt: string;
+export interface Image {
+  imageBlob: string;
 }
 
 interface ArticleImagesProps {
@@ -16,10 +15,10 @@ const ArticleImages: React.FC<ArticleImagesProps> = ({ images }) => {
     <div className="article-images">
       {images.map((image, index) => (
         <img
-          className="max-w-64 max-h-40 rounded-lg"
           key={index}
-          src={image.url}
-          alt={image.alt}
+          src={`data:image/jpeg;base64,${image.imageBlob}`} // Assuming your images are JPEG, adjust if needed
+          alt={`Image ${index}`}
+          className="max-w-64 max-h-40 rounded-lg"
         />
       ))}
     </div>

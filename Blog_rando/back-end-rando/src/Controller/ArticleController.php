@@ -40,8 +40,8 @@ class ArticleController extends AbstractController
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        $title = $data['title'];
-        $content = $data['content'];
+        $title = "test";
+        $content = "test";
         $createdAt = new \DateTimeImmutable();
 
         // Create a new Article entity
@@ -64,7 +64,7 @@ class ArticleController extends AbstractController
                 // Handle file upload and save to the filesystem
                 $filename = uniqid() . '.' . $uploadedFile->guessExtension();
                 $uploadedFile->move($this->getParameter('photos_directory'), $filename);
-                $photo->setImagePath('/uploads/photos/' . $filename);
+
 
                 // Add the Photo entity to the Article's collection
                 $article->addPhoto($photo);
@@ -86,19 +86,31 @@ class ArticleController extends AbstractController
         return $this->json($responseData, Response::HTTP_CREATED);
     }
     #[Route('/api/getArticles', name: 'api_get_articles')]
-    public function getArticles(Request $request)
+    public function getArticles(Request $request): JsonResponse
     {
         $articles = $this->articleRepository->findAll();
         $response = [];
+
         foreach ($articles as $article) {
+            $photos = [];
+            foreach ($article->getPhotos() as $photo) {
+                $photos[] = [
+                    'id' => $photo->getId(),
+                    'size' => $photo->getSize(),
+                    'imageBlob' => base64_encode(stream_get_contents($photo->getImageBlob())), // Encode the blob data
+                ];
+            }
+
             $response[] = [
+                'id' => $article->getId(),
                 'title' => $article->getTitle(),
                 'content' => $article->getContent(),
-                'createdAt' => $article->getCreatedAt(),
+                'createdAt' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
+                'photos' => $photos,
                 'user' => $article->getUser()->getUserIdentifier(),
             ];
         }
 
-        return $this->json($response);
+        return new JsonResponse($response);
     }
 }

@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react';
 import { getAllArticles } from '../services/ArticlesService'
 
-type Article = {
+export type Article = {
     id: number;
     title: string;
     content: string;
+    createdAt: string;
+    photos: {
+        id: number;
+        size: number;
+        imageBlob: string;
+    }[];
+    user: string;
 };
 
 const useArticles = () => {

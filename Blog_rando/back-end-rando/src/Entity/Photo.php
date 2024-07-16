@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\PhotoRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[ORM\Entity(repositoryClass: PhotoRepository::class)]
 class Photo
@@ -20,8 +21,8 @@ class Photo
     #[ORM\ManyToOne(inversedBy: 'photos')]
     private ?Article $article = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private ?string $imagePath = null;
+    #[ORM\Column(type: 'blob')]
+    private $imageBlob;
 
     #[Assert\File(
         maxSize: "150M",
@@ -58,27 +59,26 @@ class Photo
         return $this;
     }
 
-    public function getImagePath(): ?string
+    public function getImageFile()
     {
-        return $this->imagePath;
-    }
-
-    public function setImagePath(string $imagePath): self
-    {
-        $this->imagePath = $imagePath;
-
-        return $this;
+        return $this->imageFile;
     }
 
     public function setImageFile($imageFile): self
     {
         $this->imageFile = $imageFile;
 
+        // check if we have a new image file
+        if ($imageFile instanceof UploadedFile) {
+            // convert the file content to BLOB
+            $this->imageBlob = file_get_contents($imageFile->getPathname());
+        }
+
         return $this;
     }
 
-    public function getImageFile()
+    public function getImageBlob()
     {
-        return $this->imageFile;
+        return $this->imageBlob;
     }
 }

@@ -31,13 +31,13 @@ class Article
     #[ORM\ManyToOne(inversedBy: 'articles')]
     private ?User $User = null;
 
-    #[ORM\OneToMany(mappedBy: 'article_id', targetEntity: Comments::class)]
+    #[ORM\OneToMany(mappedBy: 'article', targetEntity: Comments::class)]
     private Collection $comments;
 
-    #[ORM\OneToMany(mappedBy: 'article_id', targetEntity: Photo::class)]
+    #[ORM\OneToMany(mappedBy: 'article', targetEntity: Photo::class, cascade: ['persist', 'remove'])]
     private Collection $photos;
 
-    #[ORM\OneToMany(mappedBy: 'article_id', targetEntity: Likes::class)]
+    #[ORM\OneToMany(mappedBy: 'article', targetEntity: Likes::class)]
     private Collection $likes;
 
     public function __construct()
