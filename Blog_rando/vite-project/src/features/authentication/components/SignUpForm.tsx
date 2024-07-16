@@ -1,15 +1,85 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import authService from "../services/signUp";
-import { FaHiking } from "react-icons/fa";
+import { Button, Group, PasswordInput, TextInput, Container, Text, Popover, Box, Progress, rem } from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { useNavigate } from "react-router-dom";
+import { IconX, IconCheck } from '@tabler/icons-react';
+
+function PasswordRequirement({ meets, label }) {
+  return (
+    <Text
+      color={meets ? 'teal' : 'red'}
+      style={{ display: 'flex', alignItems: 'center' }}
+      mt={7}
+      size="sm"
+    >
+      {meets ? (
+        <IconCheck style={{ width: rem(14), height: rem(14) }} />
+      ) : (
+        <IconX style={{ width: rem(14), height: rem(14) }} />
+      )}{' '}
+      <Box ml={10}>{label}</Box>
+    </Text>
+  );
+}
+
+const requirements = [
+  { re: /[0-9]/, label: 'Contient un chiffre' },
+  { re: /[a-z]/, label: 'Contient une minuscule' },
+  { re: /[A-Z]/, label: 'Contient une majuscule' },
+  { re: /[$&+,:;=?@#|'<>.^*()%!-]/, label: 'Contient un symbole spécial' },
+];
+
+function getStrength(password) {
+  let multiplier = password.length > 7 ? 0 : 1;
+
+  requirements.forEach((requirement) => {
+    if (!requirement.re.test(password)) {
+      multiplier += 1;
+    }
+  });
+
+  return Math.max(100 - (100 / (requirements.length + 1)) * multiplier, 10);
+}
 
 function SignUpForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const [popoverOpened, setPopoverOpened] = useState(false);
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
 
-  const registration = async () => {
+  const form = useForm({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+
+    validate: {
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Votre email n\'est pas valide (exemple@free.fr)'),
+      password: (value) => {
+        if (!value) {
+          return 'Le mot de passe ne peut pas être vide';
+        } else if (value.length < 8) {
+          return 'Le mot de passe doit contenir au moins 8 caractères';
+        } else if (!/[A-Z]/.test(value)) {
+          return 'Le mot de passe doit contenir au moins une majuscule';
+        } else if (!/[a-z]/.test(value)) {
+          return 'Le mot de passe doit contenir au moins une minuscule';
+        } else if (!/\d/.test(value)) {
+          return 'Le mot de passe doit contenir au moins un chiffre';
+        } else if (!/\W/.test(value)) {
+          return 'Le mot de passe doit contenir au moins un caractère spécial';
+        }
+        return null;
+      },
+    },
+  });
+
+  const registration = async (values) => {
     try {
-      const response = await authService.signUp(email, password);
+      const response = await authService.signUp(values.email, values.password);
       console.log(response);
+      await handleLogin(values);
     } catch (error) {
       if (error instanceof Error) {
         console.log(error.message);
@@ -17,46 +87,76 @@ function SignUpForm() {
     }
   };
 
+  const handleLogin = async (values) => {
+    try {
+      const response = await authService.login(values.email, values.password);
+      console.log(response);
+      navigate("/");
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      }
+    }
+  };
+
+  const checks = requirements.map((requirement, index) => (
+    <PasswordRequirement key={index} label={requirement.label} meets={requirement.re.test(password)} />
+  ));
+
+  const strength = getStrength(password);
+  const color = strength === 100 ? 'teal' : strength > 50 ? 'yellow' : 'red';
+
+  const demoProps = {
+    h: 50,
+    mt: 'md',
+  };
+
   return (
-    <div
-      className="min-h-screen flex items-center justify-center bg-cover bg-center"
-      style={{
-        backgroundImage: 'url("https://source.unsplash.com/featured/?hiking")',
-      }}
-    >
-      <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-xl max-w-md w-full backdrop-blur-sm">
-        <div className="flex flex-col items-center justify-center mb-6">
-          <FaHiking className="text-green-600 text-5xl mb-2" />
-          <h2 className="text-3xl font-extrabold text-green-700">
-            Inscription
-          </h2>
-        </div>
-        <label className="block mb-4">
-          <span className="text-gray-700 font-medium">Email</span>
-          <input
-            type="text"
-            className="mt-2 block w-full px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm transition duration-200"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </label>
-        <label className="block mb-6">
-          <span className="text-gray-700 font-medium">Mot de passe</span>
-          <input
-            type="password"
-            className="mt-2 block w-full px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm transition duration-200"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
-        <button
-          onClick={registration}
-          className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200"
-        >
-          Inscription
-        </button>
-      </div>
-    </div>
+    <Container size="xs" {...demoProps}>
+      <form onSubmit={form.onSubmit((values) => registration(values))}>
+        <TextInput
+          withAsterisk
+          label="Email"
+          placeholder="votre@email.com"
+          key={form.key('email')}
+          {...form.getInputProps('email')}
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            form.setFieldValue('email', e.target.value);
+          }}
+        />
+        <Popover opened={popoverOpened} position="bottom" width="target" transitionProps={{ transition: 'pop' }}>
+          <Popover.Target>
+            <div
+              onFocusCapture={() => setPopoverOpened(true)}
+              onBlurCapture={() => setPopoverOpened(false)}
+            >
+              <PasswordInput
+                withAsterisk
+                label="Mot de passe"
+                placeholder="Votre mot de passe"
+                key={form.key('password')}
+                {...form.getInputProps('password')}
+                value={password}
+                onChange={(event) => {
+                  setPassword(event.currentTarget.value);
+                  form.setFieldValue('password', event.currentTarget.value);
+                }}
+              />
+            </div>
+          </Popover.Target>
+          <Popover.Dropdown>
+            <Progress color={color} value={strength} size={5} mb="xs" />
+            <PasswordRequirement label="Inclut au moins 8 caractères" meets={password.length > 7} />
+            {checks}
+          </Popover.Dropdown>
+        </Popover>
+        <Group justify="flex-end" mt="md">
+          <Button type="submit">Inscription</Button>
+        </Group>
+      </form>
+    </Container>
   );
 }
 

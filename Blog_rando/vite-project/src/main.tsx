@@ -8,6 +8,8 @@ import Profil from "./pages/Profil";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import '@mantine/core/styles.css';
+
 const router = createBrowserRouter([
   {
     path: "/",
