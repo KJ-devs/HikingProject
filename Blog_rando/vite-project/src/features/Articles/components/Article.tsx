@@ -11,7 +11,18 @@ export interface ArticleProps {
 
 function ArticleComponent({ article }: ArticleProps) {
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
+    <Card
+      shadow="md"
+      padding="mg"
+      radius="md"
+      withBorder
+      style={{
+        backgroundColor: "#2E8B57",
+        borderColor: "#006400",
+        color: "#F5FFFA",
+        padding: "20px",
+      }}
+    >
       <ArticleTitle title={article.title} />
       <ArticleContent content={article.content} />
       <Card.Section>

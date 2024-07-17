@@ -1,7 +1,7 @@
 import React from "react";
 import ArticleComponent from "./Article";
 import useArticles from "../hooks/useArticles";
-import { LoadingOverlay, Box } from "@mantine/core";
+import { LoadingOverlay, Box, Container } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 interface ArticleListProps {}
@@ -28,11 +28,28 @@ const ArticleList: React.FC<ArticleListProps> = () => {
   }
 
   return (
-    <div className="article-list">
+    <Container
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+      }}
+    >
       {articles.map((article) => (
-        <ArticleComponent key={article.id} article={article} />
+        <Box
+          key={article.id}
+          style={{
+            marginBottom: "20px",
+            width: "100%",
+            maxWidth: "600px",
+          }}
+        >
+          <ArticleComponent article={article} />
+        </Box>
       ))}
-    </div>
+    </Container>
   );
 };
 

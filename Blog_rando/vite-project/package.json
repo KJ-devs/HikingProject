@@ -29,7 +29,7 @@
     "@tiptap/starter-kit": "^2.5.1",
     "axios": "^1.6.4",
     "dayjs": "^1.11.11",
-    "embla-carousel-react": "^8.1.6",
+    "embla-carousel-react": "^7.1.0",
     "eslint-config-airbnb-typescript": "^17.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
