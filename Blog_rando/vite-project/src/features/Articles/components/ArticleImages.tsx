@@ -13,8 +13,8 @@ interface ArticleImagesProps {
 const ArticleImages: React.FC<ArticleImagesProps> = ({ images }) => {
   return images.length === 0 ? null : (
     <Carousel
+      style={{ paddingTop: "28px" }}
       withIndicators
-      slideSize="70%"
       height={200}
       slideGap="md"
       controlsOffset="xs"
@@ -24,8 +24,7 @@ const ArticleImages: React.FC<ArticleImagesProps> = ({ images }) => {
         <Carousel.Slide key={index}>
           <Image
             src={`data:image/jpeg;base64,${image.imageBlob}`}
-            h={150} // Ensure the image height matches the carousel height
-            fit="contain"
+            h={200} // Ensure the image height matches the carousel height
             alt={`Image ${index + 1}`}
           />
         </Carousel.Slide>

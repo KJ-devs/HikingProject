@@ -28,8 +28,8 @@ class ArticleController extends AbstractController
     #[Route('/api/createArticle', name: 'api_article')]
     public function createArticle(Request $request): JsonResponse
     {
-        // Récupérer les données de la requête
-        $data = json_decode($request->getContent(), true);
+        $title = $request->request->get('title');
+        $content = $request->request->get('content');
 
         // Gérer l'authentification (exemple)
         $user = $this->getUser(); // Assuming getUser() returns the authenticated user
@@ -40,8 +40,8 @@ class ArticleController extends AbstractController
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        $title = "test";
-        $content = "test";
+
+
         $createdAt = new \DateTimeImmutable();
 
         // Create a new Article entity
@@ -65,7 +65,6 @@ class ArticleController extends AbstractController
                 $filename = uniqid() . '.' . $uploadedFile->guessExtension();
                 $uploadedFile->move($this->getParameter('photos_directory'), $filename);
 
-
                 // Add the Photo entity to the Article's collection
                 $article->addPhoto($photo);
             }
@@ -85,6 +84,7 @@ class ArticleController extends AbstractController
 
         return $this->json($responseData, Response::HTTP_CREATED);
     }
+
     #[Route('/api/getArticles', name: 'api_get_articles')]
     public function getArticles(Request $request): JsonResponse
     {
@@ -105,7 +105,7 @@ class ArticleController extends AbstractController
                 'id' => $article->getId(),
                 'title' => $article->getTitle(),
                 'content' => $article->getContent(),
-                'createdAt' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
+                'createdAt' => $article->getCreatedAt()->format('Y-m-d'),
                 'photos' => $photos,
                 'user' => $article->getUser()->getUserIdentifier(),
             ];
