@@ -1,5 +1,5 @@
 // import NavBar from "../components/navbar/Navbar";
-import SignUpForm from "../features/authentication/components/SignUpForm";
+import SignUpForm from "../features/authentication/components/SignUpForm/SignUpForm";
 import { MantineProvider } from "@mantine/core";
 
 function SignUp() {
