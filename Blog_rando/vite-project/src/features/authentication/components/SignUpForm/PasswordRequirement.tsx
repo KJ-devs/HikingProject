@@ -1,29 +1,26 @@
-import { Text, Box } from "@mantine/core";
+import { Box, Text } from "@mantine/core";
 import { IconX, IconCheck } from "@tabler/icons-react";
-import { rem } from "@mantine/core";
 
 interface PasswordRequirementProps {
   meets: boolean;
   label: string;
 }
 
-function PasswordRequirement({ meets, label }: PasswordRequirementProps) {
-  return (
-    <Text
-      c={meets ? "teal" : "red"}
-      style={{ display: "flex", alignItems: "center" }}
-      mt={7}
-      size="sm"
-    >
-      {meets ? (
-        <IconCheck style={{ width: rem(14), height: rem(14) }} />
-      ) : (
-        <IconX style={{ width: rem(14), height: rem(14) }} />
-      )}{" "}
-      <Box ml={10}>{label}</Box>
-    </Text>
-  );
-}
+const PasswordRequirement = ({ meets, label }: PasswordRequirementProps) => {
+  const color = meets ? "teal" : "red";
 
+  return (
+    <Box mt={7} style={{ display: "flex", alignItems: "center", color: color }}>
+      {meets ? (
+        <IconCheck style={{ width: 14, height: 14 }} />
+      ) : (
+        <IconX style={{ width: 14, height: 14 }} />
+      )}
+      <Text ml={10} size="sm" style={{ color: color }}>
+        {label}
+      </Text>
+    </Box>
+  );
+};
 
 export default PasswordRequirement;

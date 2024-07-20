@@ -1,9 +1,9 @@
 
 export const requirements = [
   { re: /.{8,}/, label: "Contient au moins 8 caractères" },
-  { re: /[0-9]/, label: "Contient un chiffre" },
   { re: /[a-z]/, label: "Contient une minuscule" },
   { re: /[A-Z]/, label: "Contient une majuscule" },
+  { re: /[0-9]/, label: "Contient un chiffre" },
   { re: /[$&+,:;=?@#|'<>.^*()%!-]/, label: "Contient un symbole spécial" },
 ];
 
@@ -36,7 +36,6 @@ export const validatePassword = (value: string): string | null => {
   } else if (value.length < 8) {
     return "Le mot de passe doit contenir au moins 8 caractères";
   } else if (!/[A-Z]/.test(value)) {
-    console.log("value", value);
     return "Le mot de passe doit contenir au moins une majuscule";
   } else if (!/[a-z]/.test(value)) {
     return "Le mot de passe doit contenir au moins une minuscule";
