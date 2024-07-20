@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Entity\Article;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Photo;
 
 class ArticleController extends AbstractController
 {
@@ -27,11 +28,11 @@ class ArticleController extends AbstractController
     #[Route('/api/createArticle', name: 'api_article')]
     public function createArticle(Request $request): JsonResponse
     {
-        // Récupérer les données de la requête
-        $data = json_decode($request->getContent(), true);
+        $title = $request->request->get('title');
+        $content = $request->request->get('content');
 
         // Gérer l'authentification (exemple)
-        $user = $this->security->getUser();
+        $user = $this->getUser(); // Assuming getUser() returns the authenticated user
 
         if (!$user) {
             return $this->json([
@@ -39,42 +40,77 @@ class ArticleController extends AbstractController
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        $title = $data['title'];
-        $content = $data['content'];
+
+
         $createdAt = new \DateTimeImmutable();
+
+        // Create a new Article entity
         $article = new Article();
         $article->setTitle($title);
         $article->setContent($content);
         $article->setCreatedAt($createdAt);
         $article->setUser($user);
 
+        // Handle file upload if photos are included in the request
+        $uploadedFiles = $request->files->get('photos');
+        if ($uploadedFiles) {
+            foreach ($uploadedFiles as $uploadedFile) {
+                // Create a new Photo entity for each uploaded file
+                $photo = new Photo();
+                $photo->setImageFile($uploadedFile);
+                $photo->setSize($uploadedFile->getSize());
+                $photo->setArticle($article);
+
+                // Handle file upload and save to the filesystem
+                $filename = uniqid() . '.' . $uploadedFile->guessExtension();
+                $uploadedFile->move($this->getParameter('photos_directory'), $filename);
+
+                // Add the Photo entity to the Article's collection
+                $article->addPhoto($photo);
+            }
+        }
+
         $this->entityManager->persist($article);
         $this->entityManager->flush();
 
-
-        $response = [
-            'user' => $user->getUserIdentifier(), // Assuming User entity has getUserIdentifier() method
-            'title' => $title,
-            'content' => $content,
-            'createdAt' => $createdAt,
+        // Prepare the response
+        $responseData = [
+            'id' => $article->getId(),
+            'user' => $article->getUser(),
+            'title' => $article->getTitle(),
+            'content' => $article->getContent(),
+            'createdAt' => $article->getCreatedAt()->format('Y-m-d H:i:s'),
         ];
 
-        return $this->json($response);
+        return $this->json($responseData, Response::HTTP_CREATED);
     }
+
     #[Route('/api/getArticles', name: 'api_get_articles')]
-    public function getArticles(Request $request)
+    public function getArticles(Request $request): JsonResponse
     {
         $articles = $this->articleRepository->findAll();
         $response = [];
+
         foreach ($articles as $article) {
+            $photos = [];
+            foreach ($article->getPhotos() as $photo) {
+                $photos[] = [
+                    'id' => $photo->getId(),
+                    'size' => $photo->getSize(),
+                    'imageBlob' => base64_encode(stream_get_contents($photo->getImageBlob())), // Encode the blob data
+                ];
+            }
+
             $response[] = [
+                'id' => $article->getId(),
                 'title' => $article->getTitle(),
                 'content' => $article->getContent(),
-                'createdAt' => $article->getCreatedAt(),
+                'createdAt' => $article->getCreatedAt()->format('Y-m-d'),
+                'photos' => $photos,
                 'user' => $article->getUser()->getUserIdentifier(),
             ];
         }
 
-        return $this->json($response);
+        return new JsonResponse($response);
     }
 }

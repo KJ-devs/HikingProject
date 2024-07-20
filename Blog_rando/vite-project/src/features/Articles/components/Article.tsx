@@ -1,34 +1,39 @@
-// features/Articles/components/Article.tsx
-
-import React from "react";
 import ArticleTitle from "./ArticleTitle";
 import ArticleContent from "./ArticleContent";
-// import ArticleImages from "./ArticleImages";
-
-export interface Image {
-  url: string;
-  alt: string;
-}
-
-export interface Article {
-  id: number;
-  title: string;
-  content: string;
-  // images: Image[];
-}
+import ArticleImages from "./ArticleImages";
+import { Article } from "../hooks/useArticles";
+import { Card, Group } from "@mantine/core";
+import { Carousel } from "@mantine/carousel";
+import ArticleProfil from "./ArticleProfil";
 
 export interface ArticleProps {
   article: Article;
 }
 
-const ArticleComponent: React.FC<ArticleProps> = ({ article }) => {
+function ArticleComponent({ article }: ArticleProps) {
   return (
-    <div className="article bg-slate-500 border border-sky-500">
-      <ArticleTitle title={article.title} />
+    <Card
+      shadow="md"
+      padding="mg"
+      radius="md"
+      withBorder
+      style={{
+        backgroundColor: "#2E8B57",
+        borderColor: "#006400",
+        color: "#F5FFFA",
+      }}
+    >
+      <Group>
+        <ArticleProfil />
+
+        <ArticleTitle title={article.title} createdAt={article.createdAt} />
+      </Group>
+      <Card.Section>
+        <ArticleImages images={article.photos} />
+      </Card.Section>
       <ArticleContent content={article.content} />
-      {/* <ArticleImages images={article.images} /> */}
-    </div>
+    </Card>
   );
-};
+}
 
 export default ArticleComponent;

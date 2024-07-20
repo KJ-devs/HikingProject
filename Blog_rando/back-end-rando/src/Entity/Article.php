@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 class Article
 {
@@ -30,13 +31,13 @@ class Article
     #[ORM\ManyToOne(inversedBy: 'articles')]
     private ?User $User = null;
 
-    #[ORM\OneToMany(mappedBy: 'article_id', targetEntity: Comments::class)]
+    #[ORM\OneToMany(mappedBy: 'article', targetEntity: Comments::class)]
     private Collection $comments;
 
-    #[ORM\OneToMany(mappedBy: 'article_id', targetEntity: Photo::class)]
+    #[ORM\OneToMany(mappedBy: 'article', targetEntity: Photo::class, cascade: ['persist', 'remove'])]
     private Collection $photos;
 
-    #[ORM\OneToMany(mappedBy: 'article_id', targetEntity: Likes::class)]
+    #[ORM\OneToMany(mappedBy: 'article', targetEntity: Likes::class)]
     private Collection $likes;
 
     public function __construct()
@@ -153,7 +154,7 @@ class Article
     {
         if (!$this->photos->contains($photo)) {
             $this->photos->add($photo);
-            $photo->setArticleId($this);
+            $photo->setArticle($this);
         }
 
         return $this;
@@ -163,8 +164,8 @@ class Article
     {
         if ($this->photos->removeElement($photo)) {
             // set the owning side to null (unless already changed)
-            if ($photo->getArticleId() === $this) {
-                $photo->setArticleId(null);
+            if ($photo->getArticle() === $this) {
+                $photo->setArticle(null);
             }
         }
 
