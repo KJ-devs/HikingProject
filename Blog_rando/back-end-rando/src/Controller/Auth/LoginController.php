@@ -1,28 +1,47 @@
 <?php
 
-// src/Controller/Auth/LoginController.php
-
 namespace App\Controller\Auth;
 
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\User;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Repository\UserRepository;
 
 class LoginController extends AbstractController
 {
-    #[Route('/auth/login', name: 'api_login', methods: ['POST'])]
-    public function index(#[CurrentUser] ?User $user): Response
-    {
+    private UserRepository $userRepository;
+    private UserPasswordHasherInterface $passwordHasher;
+    private JWTTokenManagerInterface $jwtManager;
 
-        if (null === $user) {
-            return $this->json([
-                'message' => 'missing credentials',
-            ], Response::HTTP_UNAUTHORIZED);
+    public function __construct(
+        UserRepository $userRepository,
+        UserPasswordHasherInterface $passwordHasher,
+        JWTTokenManagerInterface $jwtManager
+    ) {
+        $this->userRepository = $userRepository;
+        $this->passwordHasher = $passwordHasher;
+        $this->jwtManager = $jwtManager;
+    }
+
+    #[Route('/api/login', name: 'api_login', methods: ['POST'])]
+    public function login(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'] ?? '';
+        $password = $data['password'] ?? '';
+
+        $user = $this->userRepository->findOneByEmail($email);
+
+        if (!$user || !$this->passwordHasher->isPasswordValid($user, $password)) {
+            return new JsonResponse(['message' => 'Invalid credentials.'], JsonResponse::HTTP_UNAUTHORIZED);
         }
-        return $this->json([
-            'user'  => $user->getUserIdentifier(),
-        ]);
+
+        // Generate JWT token
+        $token = $this->jwtManager->create($user);
+
+        return new JsonResponse(['token' => $token]);
     }
 }

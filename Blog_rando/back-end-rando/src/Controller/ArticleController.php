@@ -25,7 +25,7 @@ class ArticleController extends AbstractController
         $this->entityManager = $entityManager;
         $this->articleRepository = $articleRepository;
     }
-    #[Route('/api/createArticle', name: 'api_article')]
+    #[Route('/api/article', name: 'api_article', methods: ['POST'])]
     public function createArticle(Request $request): JsonResponse
     {
         $title = $request->request->get('title');
@@ -51,21 +51,13 @@ class ArticleController extends AbstractController
         $article->setCreatedAt($createdAt);
         $article->setUser($user);
 
-        // Handle file upload if photos are included in the request
         $uploadedFiles = $request->files->get('photos');
         if ($uploadedFiles) {
             foreach ($uploadedFiles as $uploadedFile) {
-                // Create a new Photo entity for each uploaded file
                 $photo = new Photo();
                 $photo->setImageFile($uploadedFile);
                 $photo->setSize($uploadedFile->getSize());
                 $photo->setArticle($article);
-
-                // Handle file upload and save to the filesystem
-                $filename = uniqid() . '.' . $uploadedFile->guessExtension();
-                $uploadedFile->move($this->getParameter('photos_directory'), $filename);
-
-                // Add the Photo entity to the Article's collection
                 $article->addPhoto($photo);
             }
         }
@@ -85,7 +77,7 @@ class ArticleController extends AbstractController
         return $this->json($responseData, Response::HTTP_CREATED);
     }
 
-    #[Route('/api/getArticles', name: 'api_get_articles')]
+    #[Route('/api/articles', name: 'api_get_articles', methods: ['GET'])]
     public function getArticles(Request $request): JsonResponse
     {
         $articles = $this->articleRepository->findAll();
