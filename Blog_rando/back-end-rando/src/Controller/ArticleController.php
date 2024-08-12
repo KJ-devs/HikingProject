@@ -105,4 +105,70 @@ class ArticleController extends AbstractController
 
         return new JsonResponse($response);
     }
+
+    #[Route('/api/article/{id}', name: 'api_get_article', methods: ['GET'])]
+    public function getArticle(int $id): JsonResponse
+    {
+        $article = $this->articleRepository->find($id);
+
+        if (!$article) {
+            return new JsonResponse(['error' => 'Article not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $photos = [];
+        foreach ($article->getPhotos() as $photo) {
+            $photos[] = [
+                'id' => $photo->getId(),
+                'size' => $photo->getSize(),
+                'imageBlob' => base64_encode(stream_get_contents($photo->getImageBlob())), // Encode the blob data
+            ];
+        }
+
+        $response = [
+            'id' => $article->getId(),
+            'title' => $article->getTitle(),
+            'content' => $article->getContent(),
+            'createdAt' => $article->getCreatedAt()->format('Y-m-d'),
+            'photos' => $photos,
+            'user' => $article->getUser()->getUserIdentifier(),
+        ];
+
+        return new JsonResponse($response);
+    }
+
+    #[Route('/api/article/{id}', name: 'api_delete_article', methods: ['DELETE'])]
+    public function deleteArticle(int $id): JsonResponse
+    {
+        $article = $this->articleRepository->find($id);
+
+        if (!$article) {
+            return new JsonResponse(['error' => 'Article not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $this->entityManager->remove($article);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['status' => 'Article deleted']);
+    }
+   
+
+    #[Route('/api/article/{id}', name: 'api_edit_article', methods: ['PUT'])]
+    public function editArticle(int $id, Request $request): JsonResponse
+    {
+        $article = $this->articleRepository->find($id);
+
+        if (!$article) {
+            return new JsonResponse(['error' => 'Article not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $title = $request->request->get('title');
+        $content = $request->request->get('content');
+
+        $article->setTitle($title);
+        $article->setContent($content);
+
+        $this->entityManager->flush();
+
+        return new JsonResponse(['status' => 'Article updated']);
+    }
 }

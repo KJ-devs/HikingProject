@@ -42,8 +42,7 @@ function SignUpForm() {
 
   const registration = async (values: { email: string; password: string }) => {
     try {
-      const response = await authService.signUp(values.email, values.password);
-      console.log(response);
+      await authService.signUp(values.email, values.password);
     } catch (error) {
       if (error instanceof Error) {
         console.log(error.message);

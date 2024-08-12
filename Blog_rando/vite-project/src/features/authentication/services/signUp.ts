@@ -11,7 +11,7 @@ const signUp = async (email: string, password: string) => {
         return "Success";
       }
     } catch (error) {
-      throw new Error("Inscription non prit en compte");
+      throw new Error((error as any));
     }
   } else {
     throw new Error("Tous les champs sont requis");

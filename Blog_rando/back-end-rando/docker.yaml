@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: symfony
+      MYSQL_USER: symfony_user
+      MYSQL_PASSWORD: symfony_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  mercure:
+    image: dunglas/mercure
+    container_name: mercure
+    restart: always
+    environment:
+      MERCURE_PUBLISHER_JWT_KEY: "%env(MERCURE_PUBLISHER_JWT_KEY)%"
+      MERCURE_SUBSCRIBER_JWT_KEY: "%env(MERCURE_SUBSCRIBER_JWT_KEY)%"
+      MERCURE_CORS_ALLOW_ORIGIN: "*"
+    ports:
+      - "3000:80"
+
+  php:
+    image: php:8.1-fpm
+    container_name: php
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "9000:9000"
+    depends_on:
+      - mysql
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - .:/var/www/html
+    ports:
+      - "80:80"
+    depends_on:
+      - php
+
+volumes:
+  mysql_data:

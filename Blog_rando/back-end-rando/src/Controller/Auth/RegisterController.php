@@ -104,4 +104,46 @@ class RegisterController extends AbstractController
 
         return new JsonResponse(['message' => 'Registration successful! A verification email has been sent.'], JsonResponse::HTTP_CREATED);
     }
+
+    #[Route('/auth/forgotPassword', name: 'api_forgotPassword', methods: ['POST'])]
+    public function forgotPassword(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'] ?? '';
+        $emailConstraints = [
+            new Assert\NotBlank(),
+            new Assert\Email(),
+            new Assert\Length(['max' => 180]),
+        ];
+        $validator = Validation::createValidator();
+
+        $emailViolations = $validator->validate($email, $emailConstraints);
+        if (count($emailViolations) > 0) {
+            $errors = [];
+            foreach ($emailViolations as $violation) {
+                $errors['email'][] = $violation->getMessage();
+            }
+            return new JsonResponse(['errors' => $errors], JsonResponse::HTTP_BAD_REQUEST);
+        }
+        $user = $this->userRepository->findOneByEmail($email);
+
+        if (!$user) {
+            return new JsonResponse(['message' => 'User not found'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        try {
+            $this->mailerService->send(
+                'krebsjerem@gmail.com',
+                $email,
+                'Click the link down below to reset your password',
+                'test',
+                $user->getEmail()
+            );
+        } catch (\Exception $e) {
+            return new JsonResponse(['message' => 'Error sending email: ' . $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+
+        $email = $data['email'] ?? '';
+    }
 }

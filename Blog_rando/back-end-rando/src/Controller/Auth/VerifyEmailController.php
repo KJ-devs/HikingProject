@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\UserRepository;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class VerifyEmailController extends AbstractController
 {
@@ -18,7 +19,7 @@ class VerifyEmailController extends AbstractController
     }
 
     #[Route('/api/verify-email', name: 'api_verify_email', methods: ['GET'])]
-    public function verifyEmail(Request $request): JsonResponse
+    public function verifyEmail(Request $request): RedirectResponse
     {
         $token = $request->query->get('token');
 
@@ -39,6 +40,13 @@ class VerifyEmailController extends AbstractController
 
         // flush the entity manager
 
-        return new JsonResponse(['message' => 'Email verified successfully.'], JsonResponse::HTTP_OK);
+        return new RedirectResponse('http://localhost:5173/login');
+
+        // redirect to http://localhost:5173/
+
+
+
+
+
     }
 }

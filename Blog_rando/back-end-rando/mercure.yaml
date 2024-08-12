@@ -1,0 +1,3 @@
+MERCURE_PUBLISHER_JWT_KEY: %kernel.project_dir%/config/jwt/private.pem
+MERCURE_SUBSCRIBER_JWT_KEY: %kernel.project_dir%/config/jwt/private.pem
+MERCURE_CORS_ALLOWED_ORIGINS: '*'

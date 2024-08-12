@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\MessagesRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -19,13 +17,9 @@ class Messages
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'messages')]
-    private Collection $user_id;
-
-    public function __construct()
-    {
-        $this->user_id = new ArrayCollection();
-    }
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'messages')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $author = null;
 
     public function getId(): ?int
     {
@@ -44,26 +38,14 @@ class Messages
         return $this;
     }
 
-    /**
-     * @return Collection<int, User>
-     */
-    public function getUserId(): Collection
+    public function getAuthor(): ?User
     {
-        return $this->user_id;
+        return $this->author;
     }
 
-    public function addUserId(User $userId): static
+    public function setAuthor(User $author): static
     {
-        if (!$this->user_id->contains($userId)) {
-            $this->user_id->add($userId);
-        }
-
-        return $this;
-    }
-
-    public function removeUserId(User $userId): static
-    {
-        $this->user_id->removeElement($userId);
+        $this->author = $author;
 
         return $this;
     }

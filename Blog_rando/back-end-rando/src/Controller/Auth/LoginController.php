@@ -39,8 +39,15 @@ class LoginController extends AbstractController
             return new JsonResponse(['message' => 'Invalid credentials.'], JsonResponse::HTTP_UNAUTHORIZED);
         }
 
-        // Generate JWT token
-        $token = $this->jwtManager->create($user);
+        // Generate JWT token and add mercure
+        $mercureClaims = [
+            'mercure' => [
+                'publish' => ['*'],
+                'subscribe' => ['*']
+            ]
+        ];
+
+        $token = $this->jwtManager->createFromPayload($user, $mercureClaims);
 
         return new JsonResponse(['token' => $token]);
     }
