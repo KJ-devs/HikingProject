@@ -1,0 +1,55 @@
+services:
+  ###> Backend Symfony ###
+  symfony:
+    build:
+      context: ./server  # Path to the server directory containing the Dockerfile
+      dockerfile: Dockerfile  # This assumes your Dockerfile is named 'Dockerfile'
+    container_name: symfony_app
+    volumes:
+      - ./server:/var/www/html:rw
+      - ./server/config/jwt:/config/jwt  # Mount JWT directory for Mercure
+    env_file:
+      - ./.env  # Load environment variables from the .env file
+    networks:
+      - symfony
+    ports:
+      - "9000:9000"
+
+  ###> Database PostgreSQL ###
+  database:
+    image: postgres:${POSTGRES_VERSION:-15}-alpine
+    container_name: symfony_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+    networks:
+      - symfony
+
+
+ 
+  ###> Frontend React ###
+  frontend:
+    build:
+      context: ./client  
+      dockerfile: Dockerfile
+    container_name: react_app
+    ports:
+      - "5173:5173"
+    networks:
+      - symfony
+    depends_on:
+      - symfony
+    environment:
+      REACT_APP_API_URL: http://localhost:9000/api
+
+networks:
+  symfony:
+    driver: bridge
+
+volumes:
+  database_data:
+  mercure_data:
+  mercure_config:
