@@ -13,15 +13,16 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Table(name: "users")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column(length: 180, unique: true)]
-    private ?string $email = null;
+    private string $email;
 
     #[ORM\Column]
     private array $roles = [];
@@ -30,7 +31,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    private ?string $password = null;
+    private string $password;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $isVerified = false;
@@ -41,14 +42,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'User', targetEntity: Article::class)]
     private Collection $articles;
 
-    #[ORM\ManyToMany(targetEntity: Messages::class, mappedBy: 'user_id')]
-    private Collection $messages;
 
     #[ORM\ManyToMany(targetEntity: Followers::class, mappedBy: 'user_id')]
     private Collection $followers;
 
-    #[ORM\OneToOne(mappedBy: 'user_id', cascade: ['persist', 'remove'])]
-    private ?UserDetails $userDetails = null;
 
     /**
      * @var Collection<int, PasswordResetRequest>
@@ -59,7 +56,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->articles = new ArrayCollection();
-        $this->messages = new ArrayCollection();
         $this->followers = new ArrayCollection();
         $this->passwordResetRequests = new ArrayCollection();
     }
@@ -191,23 +187,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Messages>
-     */
-    public function getMessages(): Collection
-    {
-        return $this->messages;
-    }
 
-
-    // public function removeMessage(Messages $message): static
-    // {
-    //     if ($this->messages->removeElement($message)) {
-    //         $message->removeUserId($this);
-    //     }
-
-    //     return $this;
-    // }
 
     /**
      * @return Collection<int, Followers>
@@ -232,23 +212,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->followers->removeElement($follower)) {
             $follower->removeUserId($this);
         }
-
-        return $this;
-    }
-
-    public function getUserDetails(): ?UserDetails
-    {
-        return $this->userDetails;
-    }
-
-    public function setUserDetails(UserDetails $userDetails): static
-    {
-        // set the owning side of the relation if necessary
-        if ($userDetails->getUserId() !== $this) {
-            $userDetails->setUserId($this);
-        }
-
-        $this->userDetails = $userDetails;
 
         return $this;
     }

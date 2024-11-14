@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 class Article
 {
@@ -60,7 +59,6 @@ class Article
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -72,7 +70,6 @@ class Article
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
-
         return $this;
     }
 
@@ -84,7 +81,6 @@ class Article
     public function setContent(string $content): static
     {
         $this->content = $content;
-
         return $this;
     }
 
@@ -96,7 +92,6 @@ class Article
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
@@ -108,7 +103,6 @@ class Article
     public function setUser(?User $User): static
     {
         $this->User = $User;
-
         return $this;
     }
 
@@ -124,21 +118,18 @@ class Article
     {
         if (!$this->comments->contains($comment)) {
             $this->comments->add($comment);
-            $comment->setArticleId($this);
+            $comment->setArticle($this); // Use setArticle instead of setArticleId
         }
-
         return $this;
     }
 
     public function removeComment(Comments $comment): static
     {
         if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
-            if ($comment->getArticleId() === $this) {
-                $comment->setArticleId(null);
+            if ($comment->getArticle() === $this) { // Use getArticle instead of getArticleId
+                $comment->setArticle(null);
             }
         }
-
         return $this;
     }
 
@@ -156,19 +147,16 @@ class Article
             $this->photos->add($photo);
             $photo->setArticle($this);
         }
-
         return $this;
     }
 
     public function removePhoto(Photo $photo): static
     {
         if ($this->photos->removeElement($photo)) {
-            // set the owning side to null (unless already changed)
             if ($photo->getArticle() === $this) {
                 $photo->setArticle(null);
             }
         }
-
         return $this;
     }
 
@@ -184,21 +172,18 @@ class Article
     {
         if (!$this->likes->contains($like)) {
             $this->likes->add($like);
-            $like->setArticleId($this);
+            $like->setArticle($this); // Use setArticle instead of setArticleId
         }
-
         return $this;
     }
 
     public function removeLike(Likes $like): static
     {
         if ($this->likes->removeElement($like)) {
-            // set the owning side to null (unless already changed)
-            if ($like->getArticleId() === $this) {
-                $like->setArticleId(null);
+            if ($like->getArticle() === $this) { // Use getArticle instead of getArticleId
+                $like->setArticle(null);
             }
         }
-
         return $this;
     }
 }

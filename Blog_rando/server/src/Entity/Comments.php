@@ -24,7 +24,7 @@ class Comments
     private ?int $likes_count = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
-    private ?Article $article_id = null;
+    private ?Article $article = null;
 
     public function getId(): ?int
     {
@@ -67,15 +67,14 @@ class Comments
         return $this;
     }
 
-    public function getArticleId(): ?Article
+    public function getArticle(): ?Article
     {
-        return $this->article_id;
+        return $this->article;
     }
 
-    public function setArticleId(?Article $article_id): static
+    public function setArticle(?Article $article): self
     {
-        $this->article_id = $article_id;
-
+        $this->article = $article;
         return $this;
     }
 }

@@ -7,7 +7,8 @@ services:
     container_name: symfony_app
     volumes:
       - ./server:/var/www/html:rw
-      - ./server/config/jwt:/config/jwt  # Mount JWT directory for Mercure
+      - ./server/config/jwt:/config/jwt
+      - ./.env:/var/www/html/.env:ro  # Mount JWT directory for Mercure
     env_file:
       - ./.env  # Load environment variables from the .env file
     networks:
@@ -28,8 +29,6 @@ services:
     networks:
       - symfony
 
-
- 
   ###> Frontend React ###
   frontend:
     build:
@@ -43,7 +42,7 @@ services:
     depends_on:
       - symfony
     environment:
-      REACT_APP_API_URL: http://localhost:9000/api
+      VITE_API_URL: http://localhost:9000/api  # Use container name for internal network
 
 networks:
   symfony:
@@ -51,5 +50,3 @@ networks:
 
 volumes:
   database_data:
-  mercure_data:
-  mercure_config:

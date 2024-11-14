@@ -17,7 +17,7 @@ class Likes
     private ?int $count = null;
 
     #[ORM\ManyToOne(inversedBy: 'likes')]
-    private ?Article $article_id = null;
+    private ?Article $article = null;
 
     public function getId(): ?int
     {
@@ -36,14 +36,14 @@ class Likes
         return $this;
     }
 
-    public function getArticleId(): ?Article
+    public function getArticle(): ?Article
     {
-        return $this->article_id;
+        return $this->article;
     }
 
-    public function setArticleId(?Article $article_id): static
+    public function setArticle(?Article $article): static
     {
-        $this->article_id = $article_id;
+        $this->article = $article;
 
         return $this;
     }

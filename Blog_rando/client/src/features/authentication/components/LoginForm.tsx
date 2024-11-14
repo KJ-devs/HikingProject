@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { FaHiking } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -20,8 +20,7 @@ function LoginForm() {
 
   const handleLogin = async () => {
     try {
-      const response = await loginService.login(email, password);
-      console.log(response);
+      await loginService.login(email, password);
       navigate("/");
     } catch (error) {
       if (error instanceof Error) {
@@ -32,8 +31,7 @@ function LoginForm() {
 
   const handleForgotPassword = async () => {
     try {
-      const response = await resetPasswordService.resetPassword(email);
-      console.log(response);
+      await resetPasswordService.resetPassword(email);
     } catch (error) {
       if (error instanceof Error) {
         console.log(error.message);

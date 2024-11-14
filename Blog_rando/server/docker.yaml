@@ -15,17 +15,6 @@ services:
     ports:
       - "3306:3306"
 
-  mercure:
-    image: dunglas/mercure
-    container_name: mercure
-    restart: always
-    environment:
-      MERCURE_PUBLISHER_JWT_KEY: "%env(MERCURE_PUBLISHER_JWT_KEY)%"
-      MERCURE_SUBSCRIBER_JWT_KEY: "%env(MERCURE_SUBSCRIBER_JWT_KEY)%"
-      MERCURE_CORS_ALLOW_ORIGIN: "*"
-    ports:
-      - "3000:80"
-
   php:
     image: php:8.1-fpm
     container_name: php
