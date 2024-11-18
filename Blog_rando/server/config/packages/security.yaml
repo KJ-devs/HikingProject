@@ -44,7 +44,7 @@ security:
     # - { path: ^/profile, roles: ROLE_USER }
 
     - { path: ^/auth/login, roles: PUBLIC_ACCESS }
-    - { path: ^/api/profile }
+    - { path: ^/api/profile, roles: ROLE_USER }
 
 when@test:
   security:

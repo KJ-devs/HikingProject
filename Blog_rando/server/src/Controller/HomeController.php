@@ -12,7 +12,7 @@ class HomeController extends AbstractController
     #[Route('/api/profile', name: 'api_profile')]
     public function index(UserInterface $user): JsonResponse
     {
-        // recupere le email du user
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $email = $this->getUser()->getUserIdentifier();
 
 

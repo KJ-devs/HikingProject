@@ -30,8 +30,8 @@ class LoginController extends AbstractController
     public function login(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $email = $data['email'] ?? '';
-        $password = $data['password'] ?? '';
+        $email = $data['email'];
+        $password = $data['password'];
 
         $user = $this->userRepository->findOneByEmail($email);
 
@@ -39,15 +39,7 @@ class LoginController extends AbstractController
             return new JsonResponse(['message' => 'Invalid credentials.'], JsonResponse::HTTP_UNAUTHORIZED);
         }
 
-        // Generate JWT token and add mercure
-        $mercureClaims = [
-            'mercure' => [
-                'publish' => ['*'],
-                'subscribe' => ['*']
-            ]
-        ];
-
-        $token = $this->jwtManager->createFromPayload($user, $mercureClaims);
+        $token = $this->jwtManager->createFromPayload($user);
 
         return new JsonResponse(['token' => $token]);
     }

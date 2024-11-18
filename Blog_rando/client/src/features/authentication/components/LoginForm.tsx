@@ -11,7 +11,7 @@ import {
   Flex,
   BackgroundImage,
 } from "@mantine/core";
-import loginService from "../services/login";
+import { login } from "../services/authService";
 import resetPasswordService from "../services/resetPassword";
 function LoginForm() {
   const [email, setEmail] = useState("");
@@ -20,7 +20,7 @@ function LoginForm() {
 
   const handleLogin = async () => {
     try {
-      await loginService.login(email, password);
+      await login(email, password);
       navigate("/");
     } catch (error) {
       if (error instanceof Error) {
